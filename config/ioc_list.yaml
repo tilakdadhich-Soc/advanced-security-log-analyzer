@@ -1,0 +1,16 @@
+# ==========================================
+# Validated Indicators of Compromise (IoCs)
+# ==========================================
+
+# Known malicious or suspicious IP addresses
+malicious_ips:
+  - "192.168.1.50"    # Flagged: Associated with automated credential stuffing attacks
+  - "10.0.0.99"       # Flagged: Tor exit node / Scanner node
+  - "203.0.113.45"    # Flagged: Known botnet command-and-control (C2) server
+
+# Known malicious or scanning tool User-Agents
+malicious_user_agents:
+  - "sqlmap"          # Automated SQL injection testing and exploitation tool
+  - "Nikto"           # Web server vulnerability scanner
+  - "Masscan"         # High-speed IP port scanner
+  - "DirBuster"       # Brute-forcing tool for directories and files on web servers

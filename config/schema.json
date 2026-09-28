@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SecurityLogSchema",
+  "description": "Standardized schema for normalizing raw security logs into structured JSON format",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The exact time when the security event occurred in ISO 8601 format."
+    },
+    "service": {
+      "type": "string",
+      "description": "The internal system or service that generated the log (e.g., auth_service, web_server)."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["auth_failure", "auth_success", "http_request", "ssh_login"],
+      "description": "The classified, normalized category of the security event."
+    },
+    "source_ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "The origin IPv4 address from which the request or attack originated."
+    },
+    "user": {
+      "type": "string",
+      "description": "The target username or system account being targeted or accessed."
+    },
+    "raw_line": {
+      "type": "string",
+      "description": "The original, unparsed raw log line preserved for forensic auditing."
+    }
+  },
+  "required": [
+    "timestamp",
+    "service",
+    "event_type",
+    "source_ip",
+    "raw_line"
+  ]
+}
