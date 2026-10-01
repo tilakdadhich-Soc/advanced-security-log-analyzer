@@ -1,4 +1,5 @@
-from utils.reputation import check_ip_reputation
+﻿from utils.reputation import check_ip_reputation
+
 
 def detect_threats(parsed_logs):
     alerts = []
@@ -14,36 +15,34 @@ def detect_threats(parsed_logs):
         if is_malicious:
             alerts.append({
                 "timestamp": timestamp,
-                "source_ip": event_type,
+                "source_ip": ip,
                 "event_type": event_type,
-                "detection_type": "IOC_MATCH",
-                "serverity": "HIGH",
-                "message": f"Malicious IP detected: {ip}. Reason: {reason}"
+                "detection_type": "ioc_match",
+                "severity": "high",
+                "message": f"Malicious IP detected: {ip}. Reason: {reason}",
             })
 
         if event_type == "auth_failure":
-            if ip not in failed_attempts_tracker:
-                failed_attempts_tracker[ip] = 0
-            failed_attempts_tracker[ip] += 1
-
+            failed_attempts_tracker[ip] = failed_attempts_tracker.get(ip, 0) + 1
             if failed_attempts_tracker[ip] >= 3:
                 alerts.append({
                     "timestamp": timestamp,
                     "source_ip": ip,
                     "event_type": event_type,
-                    "detection_type": "BRUTE_FORCE",
-                    "serverity": "MEDIUM",
-                    "message": f"Potential Brute-Force attack detected targeting user '{user}' from IP {ip} ({failed_attempts_tracker[ip]} consecutive failures)"
+                    "detection_type": "brute_force",
+                    "severity": "medium",
+                    "message": f"Potential Brute-Force attack detected targeting user '{user}' from IP {ip} ({failed_attempts_tracker[ip]} consecutive failures)",
                 })
         elif event_type == "auth_success":
-            if ip in failed_attempts_tracker and  failed_attempts_tracker[ip] >= 2:
+            if ip in failed_attempts_tracker and failed_attempts_tracker[ip] >= 2:
                 alerts.append({
                     "timestamp": timestamp,
                     "source_ip": ip,
                     "event_type": event_type,
-                    "detection_type": "ACCOUNT_TAKEOVER",
-                    "serverity": "CRITICAL",
-                    "message": f"Successful login after multiple failed attempts from IP {ip} for user '{user}' ({failed_attempts_tracker[ip]} consecutive failures)"
+                    "detection_type": "account_takeover",
+                    "severity": "critical",
+                    "message": f"Successful login after multiple failed attempts from IP {ip} for user '{user}' ({failed_attempts_tracker[ip]} consecutive failures)",
                 })
                 print(f"[DETECTOR] Total {len(alerts)} security alerts trigger hue hain.")
+
     return alerts

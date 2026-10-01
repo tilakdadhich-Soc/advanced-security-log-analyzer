@@ -1,13 +1,13 @@
-def calculate_risk_score(alert):
+﻿def calculate_risk_score(alert):
     score = 0
-    detection_type = alert.get("detection_type", "")
-    message = alert.get("message", "").lower()
+    detection_type = str(alert.get("detection_type", "")).lower()
+    message = str(alert.get("message", "")).lower()
 
-    if detection_type == "ACCOUNT_TAKEOVER":
+    if detection_type == "account_takeover":
         score += 80
-    elif detection_type == "IOC_MATCH":
+    elif detection_type == "ioc_match":
         score += 50
-    elif detection_type == "BRUTE_FORCE":
+    elif detection_type == "brute_force":
         score += 30
     else:
         score += 10
@@ -18,15 +18,20 @@ def calculate_risk_score(alert):
         score += 20
 
     if score >= 80:
-        servirity = "CRITICAL"
+        severity = "critical"
     elif score >= 55:
-        servirity = "HIGH"
+        severity = "high"
     elif score >= 30:
-        servirity = "MEDIUM"
+        severity = "medium"
     else:
-        servirity = "LOW"
+        severity = "low"
 
     alert["risk_score"] = score
-    alert["calculated_servirity"] = servirity
+    alert["calculated_severity"] = severity
+    alert["calculated-severity"] = severity
 
     return alert
+
+
+def calculate(alert):
+    return calculate_risk_score(alert)
