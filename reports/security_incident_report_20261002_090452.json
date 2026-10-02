@@ -1,0 +1,60 @@
+{
+    "generated_at": "2026-10-02T03:34:52.849040Z",
+    "total_alerts": 6,
+    "alerts": [
+        {
+            "timestamp": "Oct",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct",
+            "source_ip": "192.168.1.50",
+            "detection_type": "BRUTE_FORCE",
+            "message": "Multiple authentication failures detected from IP 192.168.1.50 (Count: 3)",
+            "risk_score": 30,
+            "calculated_severity": "medium",
+            "calculated-severity": "medium"
+        },
+        {
+            "timestamp": "Oct",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct",
+            "source_ip": "192.168.1.50",
+            "detection_type": "ACCOUNT_TAKEOVER",
+            "message": "Successful login from IP 192.168.1.50 after multiple authentication failures.",
+            "risk_score": 80,
+            "calculated_severity": "critical",
+            "calculated-severity": "critical"
+        }
+    ]
+}

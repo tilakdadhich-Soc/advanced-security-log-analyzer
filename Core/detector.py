@@ -1,48 +1,42 @@
-﻿from utils.reputation import check_ip_reputation
+﻿# core/detector.py
 
+from utils.reputation import check_ip_reputation
 
 def detect_threats(parsed_logs):
+    """Parsed logs par sliding-window logic aur IOC reputation check lagakar threats detect karta hai."""
     alerts = []
-    failed_attempts_tracker = {}
-
+    failed_attempts = {}
+    
     for log in parsed_logs:
-        ip = log.get("source_ip", "unknown")
-        event_type = log.get("event_type", "unknown")
-        user = log.get("user", "unknown")
-        timestamp = log.get("timestamp", "unknown")
-
-        is_malicious, reason = check_ip_reputation(ip)
-        if is_malicious:
+        ip = log["source_ip"]
+        
+        # Step 1: Check IP against Threat Intelligence IOC list
+        rep_result = check_ip_reputation(ip)
+        if rep_result and rep_result.get("is_malicious"):
             alerts.append({
-                "timestamp": timestamp,
+                "timestamp": log["timestamp"],
                 "source_ip": ip,
-                "event_type": event_type,
-                "detection_type": "ioc_match",
-                "severity": "high",
-                "message": f"Malicious IP detected: {ip}. Reason: {reason}",
+                "detection_type": "MALICIOUS_IOC",
+                "message": rep_result.get("description", f"Malicious IP detected: {ip}")
             })
-
-        if event_type == "auth_failure":
-            failed_attempts_tracker[ip] = failed_attempts_tracker.get(ip, 0) + 1
-            if failed_attempts_tracker[ip] >= 3:
+            
+        # Step 2: Brute-force & Account Takeover detection logic
+        if log["event_type"] == "auth_failure":
+            failed_attempts[ip] = failed_attempts.get(ip, 0) + 1
+            if failed_attempts[ip] >= 3:
                 alerts.append({
-                    "timestamp": timestamp,
+                    "timestamp": log["timestamp"],
                     "source_ip": ip,
-                    "event_type": event_type,
-                    "detection_type": "brute_force",
-                    "severity": "medium",
-                    "message": f"Potential Brute-Force attack detected targeting user '{user}' from IP {ip} ({failed_attempts_tracker[ip]} consecutive failures)",
+                    "detection_type": "BRUTE_FORCE",
+                    "message": f"Multiple authentication failures detected from IP {ip} (Count: {failed_attempts[ip]})"
                 })
-        elif event_type == "auth_success":
-            if ip in failed_attempts_tracker and failed_attempts_tracker[ip] >= 2:
+        elif log["event_type"] == "auth_success" and ip in failed_attempts:
+            if failed_attempts[ip] >= 2:
                 alerts.append({
-                    "timestamp": timestamp,
+                    "timestamp": log["timestamp"],
                     "source_ip": ip,
-                    "event_type": event_type,
-                    "detection_type": "account_takeover",
-                    "severity": "critical",
-                    "message": f"Successful login after multiple failed attempts from IP {ip} for user '{user}' ({failed_attempts_tracker[ip]} consecutive failures)",
+                    "detection_type": "ACCOUNT_TAKEOVER",
+                    "message": f"Successful login from IP {ip} after multiple authentication failures."
                 })
-                print(f"[DETECTOR] Total {len(alerts)} security alerts trigger hue hain.")
-
+                
     return alerts

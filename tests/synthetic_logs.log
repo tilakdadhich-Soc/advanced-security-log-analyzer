@@ -1,0 +1,6 @@
+# Sample Auth and Web Logs for SOC Analyzer Testing
+Oct  1 10:00:01 authserver sshd[1234]: Failed password for invalid user admin from 192.168.1.50 port 22 ssh2
+Oct  1 10:00:03 authserver sshd[1234]: Failed password for invalid user admin from 192.168.1.50 port 22 ssh2
+Oct  1 10:00:05 authserver sshd[1234]: Failed password for root from 192.168.1.50 port 22 ssh2
+Oct  1 10:00:08 authserver sshd[1234]: Accepted password for root from 192.168.1.50 port 22 ssh2
+Oct  1 10:01:12 webserver nginx[5678]: 10.0.0.15 - - [01/Oct/2026:10:01:12 +0000] "GET /admin/login.php HTTP/1.1" 200 532
