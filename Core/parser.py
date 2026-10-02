@@ -1,64 +1,75 @@
-﻿import os
-
+﻿# core/parser.py
+import re
+import json
 
 def parse_log_line(line):
-    raw_line = str(line).strip()
-    if not raw_line or raw_line.startswith("#"):
+    """
+    Multi-format log parser:
+    1. Attempts to parse JSON logs (CloudTrail, Docker, App logs).
+    2. Falls back to Syslog / Web server Regex parsing.
+    """
+    line = line.strip()
+    if not line or line.startswith("#"):
         return None
 
-    parts = raw_line.split()
-    parsed = {
-        "timestamp": None,
-        "service": "unknown",
-        "event_type": "unknown",
-        "source_ip": "unknown",
-        "user": "unknown",
-        "raw_line": raw_line,
+    # Try parsing as JSON first (Modern Cloud/App logs)
+    try:
+        data = json.loads(line)
+        return {
+            "timestamp": data.get("timestamp", "UNKNOWN"),
+            "service": data.get("service", "json_app"),
+            "event_type": data.get("event_type", "generic_event"),
+            "source_ip": data.get("source_ip", data.get("ip", "127.0.0.1")),
+            "user": data.get("user", "unknown"),
+            "raw_message": line
+        }
+    except json.JSONDecodeError:
+        pass  # Not JSON, proceed to standard syslog parsing
+
+    # Fallback: Traditional Syslog / Auth / Web Log Regex
+    pattern = r"(?P<timestamp>\S+(?:\s+\S+){2}) (?P<service>\S+) (?P<message>.*)"
+    match = re.match(pattern, line)
+    
+    if not match:
+        # Ultimate fallback for raw unstructured text
+        return {
+            "timestamp": "UNKNOWN",
+            "service": "unknown_service",
+            "event_type": "UNKNOWN",
+            "source_ip": extract_ip(line),
+            "user": "unknown",
+            "raw_message": line
+        }
+        
+    data = match.groupdict()
+    msg = data["message"]
+    
+    event_type = "UNKNOWN"
+    source_ip = extract_ip(msg)
+    user = "unknown"
+    
+    if "Failed password" in msg or "authentication failure" in msg.lower():
+        event_type = "auth_failure"
+    elif "Accepted password" in msg or "session opened" in msg.lower():
+        event_type = "auth_success"
+    elif "GET" in msg or "POST" in msg or "HTTP/" in msg:
+        event_type = "web_request"
+        
+    if "for " in msg:
+        parts = msg.split("for ")
+        if len(parts) > 1:
+            user = parts[1].split()[0]
+            
+    return {
+        "timestamp": data["timestamp"],
+        "service": data["service"],
+        "event_type": event_type,
+        "source_ip": source_ip,
+        "user": user,
+        "raw_message": msg
     }
 
-    if len(parts) < 2:
-        parsed["event_type"] = "unparsed_anomaly"
-        return parsed
-
-    parsed["timestamp"] = parts[0]
-    parsed["service"] = parts[1]
-
-    lowered = raw_line.lower()
-    if "failed password" in lowered:
-        parsed["event_type"] = "auth_failure"
-    elif "accepted password" in lowered:
-        parsed["event_type"] = "auth_success"
-    elif "get" in lowered or "post" in lowered:
-        parsed["event_type"] = "http_request"
-    else:
-        parsed["event_type"] = "unparsed_anomaly"
-
-    for index, token in enumerate(parts):
-        if token.lower() == "for" and index + 1 < len(parts):
-            parsed["user"] = parts[index + 1]
-        if token.lower() == "from" and index + 1 < len(parts):
-            parsed["source_ip"] = parts[index + 1]
-
-    if parsed["source_ip"] == "unknown":
-        for token in parts:
-            if token.count(".") == 3 and all(part.isdigit() for part in token.split(".")):
-                parsed["source_ip"] = token
-                break
-
-    return parsed
-
-
-def parse_log_file(file_path):
-    parsed_logs = []
-    if not os.path.exists(file_path):
-        print(f"[Error] File not found: {file_path}")
-        return parsed_logs
-
-    with open(file_path, "r", encoding="utf-8") as file:
-        for line in file:
-            result = parse_log_line(line)
-            if result:
-                parsed_logs.append(result)
-
-    print(f"[PARSER] Total {len(parsed_logs)} log entries parsed from {file_path}.")
-    return parsed_logs
+def extract_ip(text):
+    """Helper function to safely extract an IPv4 address from any string."""
+    ip_match = re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', text)
+    return ip_match.group(0) if ip_match else "127.0.0.1"
