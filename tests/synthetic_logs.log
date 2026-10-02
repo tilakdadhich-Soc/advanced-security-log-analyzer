@@ -4,3 +4,10 @@ Oct  1 10:00:03 authserver sshd[1234]: Failed password for invalid user admin fr
 Oct  1 10:00:05 authserver sshd[1234]: Failed password for root from 192.168.1.50 port 22 ssh2
 Oct  1 10:00:08 authserver sshd[1234]: Accepted password for root from 192.168.1.50 port 22 ssh2
 Oct  1 10:01:12 webserver nginx[5678]: 10.0.0.15 - - [01/Oct/2026:10:01:12 +0000] "GET /admin/login.php HTTP/1.1" 200 532
+
+# Mixed Logs Test: Syslog + JSON
+Oct  2 08:30:01 authserver sshd[4521]: Failed password for invalid user root from 193.168.1.100 port 22 ssh2
+Oct  2 08:30:04 authserver sshd[4521]: Failed password for invalid user root from 193.168.1.100 port 22 ssh2
+Oct  2 08:30:07 authserver sshd[4521]: Failed password for invalid user root from 193.168.1.100 port 22 ssh2
+{"timestamp": "2026-10-02T08:35:00Z", "service": "aws-cloudtrail", "event_type": "auth_failure", "source_ip": "193.168.1.100", "user": "admin", "message": "Console login failure"}
+Oct  2 08:36:12 webserver nginx[9921]: 10.0.0.99 - - [02/Oct/2026:08:36:12 +0000] "GET /wp-login.php HTTP/1.1" 401 532

@@ -5,14 +5,14 @@ import json
 def parse_log_line(line):
     """
     Multi-format log parser:
-    1. Attempts to parse JSON logs (CloudTrail, Docker, App logs).
-    2. Falls back to Syslog / Web server Regex parsing.
+    1. Attempts to parse JSON logs.
+    2. Falls back to Syslog / ISO timestamp logs.
     """
     line = line.strip()
     if not line or line.startswith("#"):
         return None
 
-    # Try parsing as JSON first (Modern Cloud/App logs)
+    # Try parsing as JSON first
     try:
         data = json.loads(line)
         return {
@@ -24,14 +24,13 @@ def parse_log_line(line):
             "raw_message": line
         }
     except json.JSONDecodeError:
-        pass  # Not JSON, proceed to standard syslog parsing
+        pass
 
-    # Fallback: Traditional Syslog / Auth / Web Log Regex
-    pattern = r"(?P<timestamp>\S+(?:\s+\S+){2}) (?P<service>\S+) (?P<message>.*)"
+    # Fallback: Syslog or ISO timestamp format
+    pattern = r"^(?P<timestamp>\S+(?:\s+\S+){0,2}) (?P<service>\S+) (?P<message>.*)"
     match = re.match(pattern, line)
     
     if not match:
-        # Ultimate fallback for raw unstructured text
         return {
             "timestamp": "UNKNOWN",
             "service": "unknown_service",
@@ -55,10 +54,16 @@ def parse_log_line(line):
     elif "GET" in msg or "POST" in msg or "HTTP/" in msg:
         event_type = "web_request"
         
+    # Robust user extraction handling "invalid user <name>" or "for <name>"
     if "for " in msg:
         parts = msg.split("for ")
         if len(parts) > 1:
-            user = parts[1].split()[0]
+            tokens = parts[1].split()
+            if tokens and tokens[0] == "invalid":
+                tokens = tokens[2:] if len(tokens) > 2 and tokens[1] == "user" else tokens[1:]
+            elif tokens and tokens[0] == "user":
+                tokens = tokens[1:]
+            user = tokens[0] if tokens else "unknown"
             
     return {
         "timestamp": data["timestamp"],
@@ -70,6 +75,5 @@ def parse_log_line(line):
     }
 
 def extract_ip(text):
-    """Helper function to safely extract an IPv4 address from any string."""
     ip_match = re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', text)
     return ip_match.group(0) if ip_match else "127.0.0.1"

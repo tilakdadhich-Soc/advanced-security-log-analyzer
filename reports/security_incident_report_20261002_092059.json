@@ -1,0 +1,87 @@
+{
+    "generated_at": "2026-10-02T03:50:59.127282Z",
+    "total_alerts": 9,
+    "alerts": [
+        {
+            "timestamp": "Oct  1 10:00:01",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct  1 10:00:03",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct  1 10:00:05",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct  1 10:00:05",
+            "source_ip": "192.168.1.50",
+            "detection_type": "BRUTE_FORCE",
+            "message": "Multiple authentication failures detected from IP 192.168.1.50 (Count: 3)",
+            "risk_score": 30,
+            "calculated_severity": "medium",
+            "calculated-severity": "medium"
+        },
+        {
+            "timestamp": "Oct  1 10:00:08",
+            "source_ip": "192.168.1.50",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 192.168.1.50 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        },
+        {
+            "timestamp": "Oct  1 10:00:08",
+            "source_ip": "192.168.1.50",
+            "detection_type": "ACCOUNT_TAKEOVER",
+            "message": "Successful login from IP 192.168.1.50 after multiple authentication failures.",
+            "risk_score": 80,
+            "calculated_severity": "critical",
+            "calculated-severity": "critical"
+        },
+        {
+            "timestamp": "Oct  2 08:30:07",
+            "source_ip": "193.168.1.100",
+            "detection_type": "BRUTE_FORCE",
+            "message": "Multiple authentication failures detected from IP 193.168.1.100 (Count: 3)",
+            "risk_score": 30,
+            "calculated_severity": "medium",
+            "calculated-severity": "medium"
+        },
+        {
+            "timestamp": "2026-10-02T08:35:00Z",
+            "source_ip": "193.168.1.100",
+            "detection_type": "BRUTE_FORCE",
+            "message": "Multiple authentication failures detected from IP 193.168.1.100 (Count: 4)",
+            "risk_score": 30,
+            "calculated_severity": "medium",
+            "calculated-severity": "medium"
+        },
+        {
+            "timestamp": "Oct  2 08:36:12",
+            "source_ip": "10.0.0.99",
+            "detection_type": "MALICIOUS_IOC",
+            "message": "IP 10.0.0.99 matches known threat intelligence feed.",
+            "risk_score": 10,
+            "calculated_severity": "low",
+            "calculated-severity": "low"
+        }
+    ]
+}
